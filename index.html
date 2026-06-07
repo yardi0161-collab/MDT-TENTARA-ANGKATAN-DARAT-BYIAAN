@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TENTARA AD</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: white;
+      min-height: 100vh;
+    }
+
+    /* Pengaturan dasar halaman */
+    .page {
+      opacity: 0;
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
+      transform: translateY(15px);
+      transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+      padding: 0 20px;
+    }
+
+    /* Saat halaman aktif dan muncul */
+    .page.active {
+      opacity: 1;
+      visibility: visible;
+      height: auto;
+      overflow: visible;
+      transform: translateY(0);
+      padding: 20px;
+      padding-bottom: 120px; /* Jarak aman agar tidak tertutup footer */
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 25px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #334155;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Kartu Profil Custom */
+    .profile-card {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border-top: 4px solid #2563eb;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .menu {
+      flex: 1;
+      background: #1e293b;
+      padding: 20px 15px;
+      border-radius: 15px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: bold;
+      border: 1px solid #334155;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu:hover {
+      background: #2563eb;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+    }
+    
+    .menu:active {
+      transform: translateY(0);
+    }
+
+    .menu-wide {
+      width: 100%;
+    }
+
+    label {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 14px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      background: #334155;
+      color: white;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+
+    textarea {
+      height: 110px;
+      resize: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 12px;
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .back {
+      background: #475569;
+      box-shadow: none;
+      margin-top: 12px;
+    }
+    
+    .back:hover {
+      background: #334155;
+    }
+
+    /* Fixed Navigation Footer Kiri & Kanan */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 12px;
+      padding: 15px 20px 25px 20px;
+      background: linear-gradient(to top, #0f172a 80%, rgba(15,23,42,0));
+      z-index: 999;
+      max-width: 440px;
+      margin: auto;
+    }
+
+    .footer div {
+      flex: 1;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      color: #94a3b8;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .footer div.active-nav, .footer div:hover {
+      background: #2563eb;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    /* Notification Toast */
+    #notif {
+      position: fixed;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981; /* Hijau sukses */
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      display: none;
+      font-weight: bold;
+      z-index: 9999;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      font-size: 14px;
+      text-align: center;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="notif"></div>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="home">
+    <div class="container">
+      <div class="title">PERSONEL TERMINAL</div>
+
+      <!-- Kotak Profil yang Dipercantik -->
+      <div class="box profile-card" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <img id="avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Profile" style="width: 75px; height: 75px; border-radius: 50%; border: 3px solid #2563eb; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        <div id="nama" style="font-weight: bold; font-size: 18px; color: #f8fafc;">Memuat nama...</div>
+      </div>
+
+      <div class="row">
+        <div class="menu" onclick="showPage('duty')">LAPORAN DUTY</div>
+        <div class="menu" onclick="showPage('patroli')">LAPORAN PATROLI</div>
+      </div>
+
+      <div class="menu menu-wide" onclick="showPage('cuti')">IZIN CUTI</div>
+    </div>
+  </div>
+
+  <!-- DUTY PAGE -->
+  <div class="page" id="duty">
+    <div class="container">
+      <div class="title">LAPORAN DUTY</div>
+
+      <input type="text" id="namaDuty" placeholder="Nama Lengkap">
+      <input type="text" id="pangkatDuty" placeholder="Pangkat / Jabatan">
+
+      <div class="box">
+        <label>Jam Awal Duty</label>
+        <input type="time" id="jamawalDuty">
+      </div>
+
+      <div class="box">
+        <label>Jam Akhir Duty</label>
+        <input type="time" id="jamakhirDuty">
+      </div>
+
+      <textarea id="kegiatanDuty" placeholder="Tuliskan detail kegiatan Duty Anda..."></textarea>
+
+      <div class="box">
+        <label>Upload Bukti Foto</label>
+        <input type="file" id="fotoDuty" style="margin-bottom:0; padding: 8px;">
+      </div>
+
+      <button onclick="kirimDuty()">KIRIM LAPORAN</button>
+      <button class="back" onclick="showPage('home')">KEMBALI</button>
+    </div>
+  </div>
+
+  <!-- PATROLI PAGE -->
+  <div class="page" id="patroli">
+    <div class="container">
+      <div class="title">LAPORAN PATROLI</div>
+
+      <input type="text" id="namaPatroli" placeholder="Nama Lengkap">
+      <input type="text" id="pangkatPatroli" placeholder="Pangkat / Jabatan">
+
+      <select id="waktuPatroli">
+        <option value="" disabled selected>Pilih Waktu Patroli</option>
+        <option>Pagi</option>
+        <option>Siang</option>
+        <option>Sore</option>
+        <option>Malam</option>
+      </select>
+
+      <textarea id="hasilPatroli" placeholder="Tuliskan hasil atau situasi area patroli..."></textarea>
+
+      <div class="box">
+        <label>Upload Bukti Foto</label>
+        <input type="file" id="fotoPatroli" accept="image/*" style="margin-bottom:0; padding: 8px;">
+      </div>
+
+      <button onclick="kirimPatroli()">KIRIM LAPORAN</button>
+      <button class="back" onclick="showPage('home')">KEMBALI</button>
+    </div>
+  </div>
+
+  <!-- CUTI PAGE -->
+  <div class="page" id="cuti">
+    <div class="container">
+      <div class="title">IZIN CUTI</div>
+
+      <input type="text" id="namaCuti" placeholder="Nama Lengkap">
+      <input type="text" id="pangkatCuti" placeholder="Pangkat / Jabatan">
+
+      <div class="box">
+        <label>Tanggal Mulai Cuti</label>
+        <input type="date" id="awalCuti" style="margin-bottom:0;">
+      </div>
+
+      <div class="box">
+        <label>Tanggal Berakhir Cuti</label>
+        <input type="date" id="akhirCuti" style="margin-bottom:0;">
+      </div>
+
+      <textarea id="alasanCuti" placeholder="Tuliskan alasan pengajuan cuti..."></textarea>
+
+      <button onclick="kirimCuti()">AJUKAN CUTI</button>
+      <button class="back" onclick="showPage('home')">KEMBALI</button>
+    </div>
+  </div>
+
+  <!-- GAJI PAGE -->
+  <div class="page" id="gaji">
+    <div class="container">
+      <div class="title">PENGAMBILAN GAJI</div>
+
+      <input type="text" id="namaGaji" placeholder="Nama Lengkap">
+      <input type="text" id="pangkatGaji" placeholder="Pangkat / Jabatan">
+
+      <div class="box">
+        <label>Tanggal Pengambilan</label>
+        <input type="date" id="tanggalGaji" style="margin-bottom:0;">
+      </div>
+
+      <input type="number" id="jumlahGaji" placeholder="Total Gaji (Rp)">
+
+      <button onclick="kirimGaji()">AMBIL GAJI</button>
+      <button class="back" onclick="showPage('home')">KEMBALI</button>
+    </div>
+  </div>
+
+  <!-- GLOBAL FIXED FOOTER (Kiri & Kanan Berdampingan) -->
+  <div class="footer">
+    <div id="nav-laporan" class="active-nav" onclick="showPage('home')">LAPORAN</div>
+    <div id="nav-gaji" onclick="showPage('gaji')">PENGAMBILAN GAJI</div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script type="module">
+    // Supabase Auth Integration
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        document.getElementById("nama").innerText = user.user_metadata.full_name || "Tidak Diketahui";
+        const fotoDiscord = user.user_metadata.avatar_url || user.user_metadata.picture;
+        if (fotoDiscord) {
+          document.getElementById("avatar").src = fotoDiscord;
+        }
+      } else {
+        document.getElementById("nama").innerText = "Tamu (Belum Login)";
+      }
+    } catch(e) {
+      document.getElementById("nama").innerText = "Gagal memuat profil";
+    }
+  </script>
+
+  <script>
+    /* NAVIGASI TRANSISI STABIL */
+    function showPage(id) {
+      // 1. Hapus class active dari semua halaman
+      document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+      });
+      
+      // 2. Munculkan halaman yang dipilih
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // 3. Update status tombol aktif di footer
+      if (id === 'gaji') {
+        document.getElementById('nav-gaji').classList.add('active-nav');
+        document.getElementById('nav-laporan').classList.remove('active-nav');
+      } else {
+        document.getElementById('nav-laporan').classList.add('active-nav');
+        document.getElementById('nav-gaji').classList.remove('active-nav');
+      }
+    }
+
+    /* KIRIM DUTY */
+    async function kirimDuty(){
+      const nama = document.getElementById("namaDuty").value;
+      const pangkat = document.getElementById("pangkatDuty").value;
+      const jamAwal = document.getElementById("jamawalDuty").value;
+      const jamAkhir = document.getElementById("jamakhirDuty").value;
+      const kegiatan = document.getElementById("kegiatanDuty").value;
+      const file = document.getElementById("fotoDuty").files[0];
+
+      if(!nama || !pangkat || !jamAwal || !jamAkhir || !kegiatan){
+        notif("Isi semua data dulu!", "#ef4444");
+        return;
+      }
+
+      const embed = {
+        title:"📌 LAPORAN DUTY",
+        description: `Nama: ${nama}\nPangkat: ${pangkat}\nJam Awal: ${jamAwal}\nJam Akhir: ${jamAkhir}\nKegiatan: ${kegiatan}`,
+        color:3447003
+      };
+
+      const formData = new FormData();
+      formData.append("payload_json", JSON.stringify({ embeds:[embed] }));
+      if(file) formData.append("file", file);
+
+      try {
+        await fetch("https://discord.com/api/webhooks/1512853150544171108/59XSF5F4BhPDkl5Zwhtp9VEFk3zuBptmVYnbCrt4yJmE8k7U0xkJRshuIrW-XfaBYJGA?thread_id=1512852956113010809",{
+          method:"POST",
+          body:formData
+        });
+        notif("DUTY terkirim ke THREAD!");
+      } catch (err) {
+        notif("Gagal mengirim data!", "#ef4444");
+      }
+    }
+
+    /* KIRIM PATROLI */
+    async function kirimPatroli(){
+      const nama = document.getElementById("namaPatroli").value;
+      const pangkat = document.getElementById("pangkatPatroli").value;
+      const waktu = document.getElementById("waktuPatroli").value;
+      const hasil = document.getElementById("hasilPatroli").value;
+      const file = document.getElementById("fotoPatroli").files[0];
+
+      if(!nama || !pangkat || !waktu || !hasil){
+        notif("Isi semua data dulu!", "#ef4444");
+        return;
+      }
+
+      const embed = {
+        title:"📋 LAPORAN PATROLI",
+        description: `Nama: ${nama}\nPangkat: ${pangkat}\nWaktu: ${waktu}\nHasil: ${hasil}`,
+        color:3447003
+      };
+
+      const formData = new FormData();
+      formData.append("payload_json", JSON.stringify({ embeds:[embed] }));
+      if(file) formData.append("file", file);
+
+      try {
+        await fetch("https://discord.com/api/webhooks/1512804056500801636/VxJtZoXLg0oagqihnhPKDQrNWkiyx4DQkKw2L3VzWIOPC0CuBHPqo0Yzkfqec3s-lUy4?thread_id=1512802524376338433",{
+          method:"POST",
+          body:formData
+        });
+        notif("LAPORAN PATROLI TELAH TERKIRIM");
+      } catch(err) {
+        notif("Gagal mengirim data!", "#ef4444");
+      }
+    }
+
+    /* KIRIM CUTI */
+    async function kirimCuti(){
+      const nama = document.getElementById("namaCuti").value;
+      const pangkat = document.getElementById("pangkatCuti").value;
+      const awal = document.getElementById("awalCuti").value;
+      const akhir = document.getElementById("akhirCuti").value;
+      const alasan = document.getElementById("alasanCuti").value;
+
+      if(!nama || !pangkat || !awal || !akhir || !alasan){
+        notif("Isi semua data dulu!", "#ef4444");
+        return;
+      }
+
+      const data = {
+        content: `IZIN CUTI\n\n# Yang terhormat bapak JENDRAL/LETJEN SAYA :\nNama : ${nama}\nPangkat : ${pangkat}\nMulai : ${awal}\nSelesai : ${akhir}\nAlasan : ${alasan}`
+      };
+
+      try {
+        await fetch("https://discord.com/api/webhooks/1512793725628317706/PWFo-snVOuwZUhcWOwg-54SmNqo7vg6pBxPpMI-D6WRvxoSeh5UlQDGLFa0oi4iZnYJZ",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(data)
+        });
+        notif("IZIN CUTI TELAH TERKIRIM, SILAHKAN MENUNGGU ACC");
+      } catch(err) {
+        notif("Gagal mengirim data!", "#ef4444");
+      }
+    }
+
+    /* KIRIM GAJI */
+    async function kirimGaji(){
+      const nama = document.getElementById("namaGaji").value;
+      const pangkat = document.getElementById("pangkatGaji").value;
+      const tanggal = document.getElementById("tanggalGaji").value;
+      const jumlah = document.getElementById("jumlahGaji").value;
+
+      if(!nama || !pangkat || !tanggal || !jumlah){
+        notif("Isi semua data dulu!", "#ef4444");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("payload_json", JSON.stringify({
+        content:`💰 PENGAMBILAN GAJI\n\nNama: ${nama}\nPangkat: ${pangkat}\nTanggal: ${tanggal}\nJumlah: Rp ${parseInt(jumlah).toLocaleString('id-ID')}`
+      }));
+
+      try {
+        await fetch("https://discord.com/api/webhooks/1512814873942294579/Xfh1WSzZFlQPGnzIvyq32Gqy47Xsnktd2I8a46DPL-6q0cm1MTLn_hQDRjlID",{
+          method:"POST",
+          body:formData
+        });
+        notif("GAJI terkirim!");
+      } catch(err) {
+        notif("Gagal mengirim data!", "#ef4444");
+      }
+    }
+
+    /* CUSTOM NOTIFIKASI TOAST */
+    function notif(text, bgColor = "#10b981"){
+      const box = document.getElementById("notif");
+      box.innerText = text;
+      box.style.background = bgColor;
+      box.style.display = "block";
+
+      setTimeout(()=>{
+        box.style.display = "none";
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
