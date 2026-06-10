@@ -1,412 +1,428 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Futuristic Tentara</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDT - Futuristic Tentara</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
-        * { font-family: 'Space Grotesk', sans-serif; }
-        .mono { font-family: 'Space Mono', monospace; }
+:root {
+  --yellow: #FACC15;
+  --black: #0A0A0A;
+  --blue: #1D4ED8;
+  --blue-light: #DBEAFE;
+  --white: #FFFFFF;
+  --gray: #6B7280;
+  --shadow: 4px 4px 0px var(--black);
+  --shadow-lg: 6px 6px 0px var(--black);
+}
 
-        .brutal-shadow { box-shadow: 5px 5px 0px 0px #000; }
-        .brutal-shadow-sm { box-shadow: 3px 3px 0px 0px #000; }
-        .brutal-shadow-lg { box-shadow: 8px 8px 0px 0px #000; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+body { background: var(--blue-light); min-height: 100vh; overflow-x: hidden; }
+.mono { font-family: 'Space Mono', monospace; }
 
-        /* Slide-in animation for panels */
-        .panel-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .panel-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        .panel-slide {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: #fafafa;
-            border-top: 4px solid #000;
-            border-radius: 0;
-            z-index: 51;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .panel-slide.active {
-            transform: translateY(0);
-        }
+/* ── LOADING OVERLAY ── */
+#loadingOverlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #0ea5e9 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  transition: opacity 0.4s ease;
+}
+#loadingOverlay.hide { opacity: 0; pointer-events: none; }
+.ld-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(250,204,21,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(250,204,21,.07) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+.ld-ring {
+  width: 80px; height: 80px; position: relative; z-index: 2;
+  border: 5px solid rgba(250,204,21,.3); border-top-color: var(--yellow);
+  border-radius: 50%; animation: spin 0.9s linear infinite;
+}
+.ld-ring::after {
+  content: '🎖️'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 26px;
+  animation: spin 0.9s linear infinite reverse;
+}
+.ld-title { position: relative; z-index: 2; color: var(--yellow); font-family: 'Space Mono', monospace; font-weight: 700; font-size: 18px; letter-spacing: .12em; text-transform: uppercase; animation: pulse .9s ease infinite; }
+.ld-dots { position: relative; z-index: 2; display: flex; gap: 8px; }
+.ld-dots span { width: 10px; height: 10px; background: var(--yellow); border-radius: 50%; border: 2px solid var(--black); }
+.ld-dots span:nth-child(1) { animation: db .9s ease infinite 0s; }
+.ld-dots span:nth-child(2) { animation: db .9s ease infinite .15s; }
+.ld-dots span:nth-child(3) { animation: db .9s ease infinite .3s; }
+.ld-bar { position: relative; z-index: 2; width: 180px; height: 7px; background: rgba(255,255,255,.2); border: 2px solid var(--yellow); overflow: hidden; }
+.ld-bar-fill { height: 100%; background: linear-gradient(90deg, var(--yellow), #fff, var(--yellow)); background-size: 200% 100%; animation: barSlide 1s ease infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.6; } }
+@keyframes db { 0%,100% { transform:translateY(0); background:var(--yellow); } 50% { transform:translateY(-10px); background:#fff; } }
+@keyframes barSlide { 0% { width:0%; } 50% { width:100%; } 100% { width:0%; } }
 
-        /* Bounce animation for icons */
-        @keyframes bounceIn {
-            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
-            50% { transform: scale(1.1) rotate(3deg); }
-            70% { transform: scale(0.95) rotate(-2deg); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-5deg); }
-            75% { transform: rotate(5deg); }
-        }
+/* ── TOP BAR ── */
+#topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--yellow); border-bottom: 4px solid var(--black);
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px;
+}
+.tb-left { display: flex; align-items: center; gap: 8px; }
+.tb-dot { width: 8px; height: 8px; background: #22c55e; border: 2px solid var(--black); border-radius: 50%; animation: blink 1.5s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
 
-        .anim-bounce { animation: bounceIn 0.5s ease forwards; }
-        .anim-slide { animation: slideUp 0.4s ease forwards; }
-        .anim-delay-1 { animation-delay: 0.05s; opacity: 0; }
-        .anim-delay-2 { animation-delay: 0.1s; opacity: 0; }
-        .anim-delay-3 { animation-delay: 0.15s; opacity: 0; }
-        .anim-delay-4 { animation-delay: 0.2s; opacity: 0; }
-        .anim-delay-5 { animation-delay: 0.25s; opacity: 0; }
+/* ── PROFILE CARD ── */
+#profileCard {
+  margin: 14px 14px 0;
+  background: var(--white); border: 4px solid var(--black);
+  box-shadow: var(--shadow-lg);
+  padding: 14px; display: flex; align-items: center; gap: 14px;
+  animation: slideUp .4s ease forwards;
+}
+.avatar-wrap { position: relative; width: 58px; height: 58px; flex-shrink: 0; }
+.avatar-wrap img { width: 100%; height: 100%; object-fit: cover; border: 4px solid var(--black); box-shadow: var(--shadow); }
+.avatar-online { position: absolute; bottom: -2px; right: -2px; width: 16px; height: 16px; background: #22c55e; border: 3px solid var(--black); border-radius: 50%; }
+.profile-info { flex: 1; }
+.profile-info .label { font-size: 9px; font-weight: 700; color: var(--gray); letter-spacing: .12em; text-transform: uppercase; }
+.profile-info .name { font-size: 17px; font-weight: 800; line-height: 1.1; }
+.profile-info .email { font-size: 10px; color: var(--gray); font-weight: 500; margin-top: 2px; }
+.btn-logout {
+  background: #f87171; border: 3px solid var(--black); box-shadow: 3px 3px 0 var(--black);
+  padding: 7px 12px; font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer;
+  letter-spacing: .05em; transition: all .1s;
+}
+.btn-logout:active { transform: translate(3px,3px); box-shadow: none; }
 
-        .menu-btn:active { transform: translate(3px, 3px); box-shadow: none !important; }
-        .menu-btn { transition: all 0.1s; }
+/* ── QUICK STATS ── */
+.quick-stats { margin: 12px 14px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.qs-card {
+  border: 3px solid var(--black); padding: 10px 6px; text-align: center;
+  box-shadow: 3px 3px 0 var(--black); animation: slideUp .4s ease forwards;
+}
+.qs-card .icon { font-size: 22px; }
+.qs-card .label { font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: .05em; }
 
-        /* Photo preview */
-        .photo-slot {
-            width: 80px; height: 80px;
-            border: 3px solid #000;
-            background: #e5e7eb;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            font-size: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s;
-        }
-        .photo-slot:hover { background: #d1d5db; transform: scale(1.05); }
-        .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+/* ── MENU GRID ── */
+.menu-grid { margin: 12px 14px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.menu-card {
+  border: 4px solid var(--black); padding: 16px 14px; text-align: left; cursor: pointer;
+  box-shadow: var(--shadow); transition: all .1s; animation: slideUp .4s ease forwards;
+  background: var(--white); position: relative; overflow: hidden;
+}
+.menu-card:active { transform: translate(4px,4px); box-shadow: none; }
+.menu-card .mc-icon { font-size: 32px; margin-bottom: 8px; display: block; }
+.menu-card .mc-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; line-height: 1.2; }
+.menu-card .mc-sub { font-size: 9px; font-weight: 500; opacity: .65; margin-top: 4px; }
+.menu-card .mc-badge { position: absolute; top: 8px; right: 8px; background: var(--black); color: var(--yellow); font-size: 8px; font-weight: 700; padding: 2px 6px; font-family: 'Space Mono', monospace; }
 
-        /* Bottom nav */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: #000;
-            border-top: 4px solid #fbbf24;
-            display: flex; justify-content: space-between;
-            padding: 8px 24px;
-            z-index: 40;
-        }
+/* Izin cuti - full width */
+.menu-cuti { margin: 0 14px; }
+.menu-cuti .menu-card { grid-column: span 2; display: flex; flex-direction: column; align-items: center; text-align: center; }
 
-        /* Status bar */
-        .status-badge {
-            animation: fadeIn 0.5s ease;
-        }
+/* ── BOTTOM NAV ── */
+#bottomNav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: var(--black); border-top: 4px solid var(--yellow);
+  display: flex; justify-content: space-between; align-items: center; padding: 8px 24px;
+}
+.bn-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; background: none; border: none; transition: all .1s; }
+.bn-btn:active { transform: scale(.92); }
+.bn-btn .bn-icon { font-size: 20px; }
+.bn-btn .bn-label { font-size: 8px; font-weight: 800; color: var(--yellow); text-transform: uppercase; letter-spacing: .12em; font-family: 'Space Mono', monospace; }
+.bn-center { color: var(--yellow); font-size: 9px; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: .1em; }
 
-        /* Tab active */
-        .tab-active {
-            background: #000 !important;
-            color: #fff !important;
-        }
+/* ── PANEL / TAB SYSTEM ── */
+.panel {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--blue-light);
+  transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto; padding-bottom: 80px;
+}
+.panel.open { transform: translateX(0); }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #000; }
+.panel-header {
+  background: var(--yellow); border-bottom: 4px solid var(--black);
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 10;
+}
+.panel-back {
+  width: 36px; height: 36px; background: var(--black); border: 3px solid var(--black);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; box-shadow: 2px 2px 0 #555; flex-shrink: 0;
+  color: var(--yellow); font-weight: 900; transition: all .1s;
+}
+.panel-back:active { transform: translate(2px,2px); box-shadow: none; }
+.panel-title { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.panel-badge { margin-left: auto; background: var(--black); color: var(--yellow); font-size: 8px; font-weight: 700; padding: 3px 8px; font-family: 'Space Mono', monospace; }
 
-        .input-field {
-            width: 100%;
-            border: 3px solid #000;
-            padding: 10px 12px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            background: #fff;
-            outline: none;
-            transition: box-shadow 0.2s;
-        }
-        .input-field:focus {
-            box-shadow: 4px 4px 0px 0px #5865F2;
-        }
+/* ── FORM STYLES ── */
+.form-section { margin: 14px; }
+.form-card {
+  background: var(--white); border: 4px solid var(--black); box-shadow: var(--shadow-lg);
+  padding: 16px; margin-bottom: 12px;
+}
+.form-card-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: var(--gray); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+.form-card-title span { font-size: 14px; }
 
-        .label-field {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 4px;
-            display: block;
-        }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 5px; color: var(--black); }
+.field input, .field select, .field textarea {
+  width: 100%; border: 3px solid var(--black); padding: 10px 12px;
+  font-size: 13px; font-weight: 600; font-family: 'Space Grotesk', sans-serif;
+  background: var(--white); outline: none; box-shadow: 3px 3px 0 var(--black);
+  transition: box-shadow .1s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  box-shadow: 5px 5px 0 var(--black); background: #fffbeb;
+}
+.field input[readonly] { background: #f3f4f6; cursor: not-allowed; color: var(--gray); box-shadow: none; }
+.field textarea { resize: vertical; min-height: 90px; }
+.field select { cursor: pointer; }
 
-        .submit-btn {
-            width: 100%;
-            background: #000;
-            color: #fff;
-            border: 3px solid #000;
-            padding: 14px;
-            font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.1s;
-            box-shadow: 4px 4px 0px 0px #5865F2;
-        }
-        .submit-btn:active { transform: translate(4px,4px); box-shadow: none; }
+/* Radio group for waktu patroli */
+.radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.radio-option { display: none; }
+.radio-label {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  border: 3px solid var(--black); padding: 10px 8px; cursor: pointer;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  background: var(--white); box-shadow: 3px 3px 0 var(--black); transition: all .1s;
+}
+.radio-option:checked + .radio-label { background: var(--yellow); box-shadow: none; transform: translate(3px,3px); }
 
-        .panel-header {
-            position: sticky; top: 0;
-            background: #000;
-            color: #fff;
-            padding: 14px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid #fbbf24;
-            z-index: 2;
-        }
-    </style>
+/* Upload area */
+.upload-area {
+  border: 3px dashed var(--black); padding: 16px; text-align: center;
+  background: #f9fafb; cursor: pointer; transition: background .2s;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.upload-area:hover { background: #fffbeb; }
+.upload-area .up-icon { font-size: 28px; }
+.upload-area .up-text { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--gray); }
+.upload-area input[type=file] { display: none; }
+.photo-previews { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.photo-preview {
+  width: 70px; height: 70px; border: 3px solid var(--black); box-shadow: 2px 2px 0 var(--black);
+  position: relative; overflow: hidden;
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-remove {
+  position: absolute; top: 2px; right: 2px; width: 18px; height: 18px;
+  background: #ef4444; border: 2px solid var(--black); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: white; cursor: pointer; font-weight: 900;
+}
+
+/* Submit button */
+.btn-submit {
+  width: 100%; background: var(--yellow); border: 4px solid var(--black);
+  box-shadow: var(--shadow); padding: 14px; font-size: 13px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em; cursor: pointer; transition: all .12s;
+  font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-submit:active { transform: translate(4px,4px); box-shadow: none; }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── ANIMASI MASUK PANEL ── */
+@keyframes slideUp { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+@keyframes bounceIn {
+  0% { transform:scale(.5) rotate(-8deg); opacity:0; }
+  60% { transform:scale(1.08) rotate(2deg); }
+  100% { transform:scale(1) rotate(0); opacity:1; }
+}
+.anim-1 { animation: bounceIn .45s ease forwards; }
+.anim-2 { animation: bounceIn .45s .06s ease both; }
+.anim-3 { animation: bounceIn .45s .12s ease both; }
+.anim-4 { animation: bounceIn .45s .18s ease both; }
+
+/* Panel inner animation */
+.panel-anim { opacity: 0; animation: slideUp .35s ease forwards; }
+.panel-anim-2 { opacity: 0; animation: slideUp .35s .07s ease forwards; }
+.panel-anim-3 { opacity: 0; animation: slideUp .35s .14s ease forwards; }
+.panel-anim-4 { opacity: 0; animation: slideUp .35s .21s ease forwards; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(30px);
+  background: var(--black); color: var(--yellow); padding: 10px 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  border: 3px solid var(--yellow); z-index: 9999; transition: all .3s; opacity: 0;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── MENU PANEL ── */
+.menu-list-item {
+  background: var(--white); border: 4px solid var(--black); box-shadow: var(--shadow);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 14px; padding: 16px;
+  cursor: pointer; transition: all .1s;
+}
+.menu-list-item:active { transform: translate(4px,4px); box-shadow: none; }
+.menu-list-item .mli-icon { font-size: 30px; flex-shrink: 0; }
+.menu-list-item .mli-info .mli-title { font-size: 13px; font-weight: 800; text-transform: uppercase; }
+.menu-list-item .mli-info .mli-sub { font-size: 10px; color: var(--gray); font-weight: 500; margin-top: 2px; }
+.menu-list-item .mli-arr { margin-left: auto; font-size: 18px; font-weight: 900; color: var(--black); }
+
+/* Date input fix mobile */
+input[type="date"], input[type="time"] { -webkit-appearance: none; }
+
+/* Bottom nav padding */
+.content-pad { padding-bottom: 76px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #dbeafe; }
+::-webkit-scrollbar-thumb { background: var(--black); border-radius: 3px; }
+</style>
 </head>
-<body class="bg-[#dbeafe] min-h-screen pb-24">
+<body>
 
-    <!-- TOP BAR -->
-    <div class="bg-yellow-400 border-b-4 border-black px-4 py-3 flex justify-between items-center sticky top-0 z-30">
-        <div class="flex items-center gap-2">
-            <span class="mono font-bold text-xs">MDT v2.1</span>
-            <div class="w-2 h-2 bg-green-500 border-2 border-black rounded-full animate-pulse"></div>
-            <span class="text-[10px] font-bold text-green-700">ONLINE</span>
-        </div>
-        <span class="mono font-black text-xs tracking-wider">FUTURISTIC_ONTOP</span>
+<!-- ══ LOADING OVERLAY ══ -->
+<div id="loadingOverlay">
+  <div class="ld-grid"></div>
+  <div class="ld-ring"></div>
+  <p class="ld-title mono">Memuat MDT...</p>
+  <div class="ld-dots"><span></span><span></span><span></span></div>
+  <div class="ld-bar"><div class="ld-bar-fill"></div></div>
+</div>
+
+<!-- ══ TOP BAR ══ -->
+<div id="topbar">
+  <div class="tb-left">
+    <span class="mono" style="font-size:10px;font-weight:700;">MDT v3.0</span>
+    <div class="tb-dot"></div>
+    <span style="font-size:9px;font-weight:700;color:#15803d;">ONLINE</span>
+  </div>
+  <span class="mono" style="font-size:10px;font-weight:900;letter-spacing:.12em;">FUTURISTIC_TENTARA</span>
+</div>
+
+<!-- ══ PROFILE CARD ══ -->
+<div id="profileCard">
+  <div class="avatar-wrap">
+    <img id="userAvatar" src="https://api.dicebear.com/7.x/identicon/svg?seed=default" alt="Avatar">
+    <div class="avatar-online"></div>
+  </div>
+  <div class="profile-info">
+    <div class="label">Selamat datang,</div>
+    <div class="name" id="userName">Loading...</div>
+    <div class="email" id="userEmail">—</div>
+  </div>
+  <button class="btn-logout" onclick="handleLogout()">KELUAR</button>
+</div>
+
+<!-- ══ QUICK STATS ══ -->
+<div class="quick-stats">
+  <div class="qs-card anim-1" style="background:#bfdbfe;">
+    <div class="icon">📋</div>
+    <div class="label">Laporan</div>
+  </div>
+  <div class="qs-card anim-2" style="background:#bbf7d0;">
+    <div class="icon">🚔</div>
+    <div class="label">Patroli</div>
+  </div>
+  <div class="qs-card anim-3" style="background:#fce7f3;">
+    <div class="icon">🏖️</div>
+    <div class="label">Cuti</div>
+  </div>
+</div>
+
+<!-- ══ MAIN MENU ══ -->
+<div class="menu-grid content-pad" style="margin-bottom:0;">
+  <div class="menu-card anim-1" style="background:#bfdbfe;" onclick="openPanel('panelDuty')">
+    <div class="mc-badge">HARIAN</div>
+    <span class="mc-icon">📝</span>
+    <div class="mc-title">Laporan Duty</div>
+    <div class="mc-sub">Kegiatan harian</div>
+  </div>
+  <div class="menu-card anim-2" style="background:#fed7aa;" onclick="openPanel('panelPatroli')">
+    <div class="mc-badge">RUTIN</div>
+    <span class="mc-icon">🚨</span>
+    <div class="mc-title">Patroli Rutin</div>
+    <div class="mc-sub">Laporan wilayah</div>
+  </div>
+</div>
+<div class="menu-cuti" style="margin-top:10px; padding-bottom:76px;">
+  <div class="menu-card anim-3" style="background:#fce7f3;" onclick="openPanel('panelCuti')">
+    <span class="mc-icon">🏖️</span>
+    <div class="mc-title">Izin Cuti</div>
+    <div class="mc-sub">Pengajuan izin & cuti</div>
+  </div>
+</div>
+
+<!-- ══ BOTTOM NAV ══ -->
+<div id="bottomNav">
+  <button class="bn-btn" onclick="openPanel('panelMenu')">
+    <span class="bn-icon">☰</span>
+    <span class="bn-label">Menu</span>
+  </button>
+  <span class="bn-center mono">◆ AKTIF ◆</span>
+  <button class="bn-btn" onclick="openPanel('panelGaji')">
+    <span class="bn-icon">💰</span>
+    <span class="bn-label">Gaji</span>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL: LAPORAN DUTY
+══════════════════════════════════════════ -->
+<div class="panel" id="panelDuty">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel('panelDuty')">←</button>
+    <div>
+      <div class="panel-title">📝 Laporan Duty</div>
+    </div>
+    <div class="panel-badge">HARIAN</div>
+  </div>
+  <div class="form-section">
+
+    <!-- Info Personel -->
+    <div class="form-card panel-anim">
+      <div class="form-card-title"><span>👤</span> Info Personel</div>
+      <div class="field">
+        <label>Nama Lengkap</label>
+        <input type="text" id="dutyNama" readonly placeholder="Otomatis dari akun">
+      </div>
+      <div class="field">
+        <label>Pangkat</label>
+        <select id="dutyPangkat">
+          <option value="">— Pilih Pangkat —</option>
+          <option>Tamtama</option><option>Prada</option><option>Pratu</option><option>Prada Kepala</option>
+          <option>Kopral Dua</option><option>Kopral Satu</option><option>Kopral Kepala</option>
+          <option>Sersan Dua</option><option>Sersan Satu</option><option>Sersan Kepala</option>
+          <option>Sersan Mayor</option><option>Pembantu Letnan Dua</option><option>Pembantu Letnan Satu</option>
+          <option>Letnan Dua</option><option>Letnan Satu</option><option>Kapten</option>
+          <option>Mayor</option><option>Letnan Kolonel</option><option>Kolonel</option>
+        </select>
+      </div>
     </div>
 
-    <!-- PROFILE CARD -->
-    <div class="mx-4 mt-4 bg-white border-4 border-black brutal-shadow-lg p-4 flex items-center gap-4 anim-slide">
-        <div class="relative">
-            <div id="avatarContainer" class="w-16 h-16 border-4 border-black bg-purple-200 overflow-hidden brutal-shadow">
-                <img id="userAvatar" src="https://via.placeholder.com/64" alt="Avatar" class="w-full h-full object-cover">
-            </div>
-            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-black rounded-full"></div>
-        </div>
-        <div class="flex-1">
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Selamat datang,</p>
-            <h2 id="userName" class="text-lg font-black leading-tight">Loading...</h2>
-            <p id="userEmail" class="text-[11px] text-gray-500 font-medium">--</p>
-        </div>
-        <button onclick="handleLogout()" class="bg-red-400 border-3 border-black px-3 py-2 text-[10px] font-black uppercase brutal-shadow-sm menu-btn" style="border:3px solid #000;">KELUAR</button>
+    <!-- Waktu Duty -->
+    <div class="form-card panel-anim-2">
+      <div class="form-card-title"><span>⏰</span> Waktu Duty</div>
+      <div class="field">
+        <label>Jam Mulai Duty</label>
+        <input type="time" id="dutyJamAwal">
+      </div>
+      <div class="field">
+        <label>Jam Selesai Duty</label>
+        <input type="time" id="dutyJamAkhir">
+      </div>
     </div>
 
-    <!-- QUICK STATUS -->
-    <div class="mx-4 mt-3 grid grid-cols-3 gap-2">
-        <div class="bg-cyan-300 border-4 border-black p-3 text-center brutal-shadow anim-slide anim-delay-1">
-            <div class="text-2xl">📋</div>
-            <div class="text-[10px] font-black uppercase mt-1">Laporan</div>
-        </div>
-        <div class="bg-green-300 border-4 border-black p-3 text-center brutal-shadow anim-slide anim-delay-2">
-            <div class="text-2xl">🚔</div>
-            <div class="text-[10px] font-black uppercase mt-1">Patroli</div>
-        </div>
-        <div class="bg-pink-300 border-4 border-black p-3 text-center brutal-shadow anim-slide anim-delay-3">
-            <div class="text-2xl">🏖️</div>
-            <div class="text-[10px] font-black uppercase mt-1">Cuti</div>
-        </div>
+    <!-- Kegiatan -->
+    <div class="form-card panel-anim-3">
+      <div class="form-card-title"><span>📋</span> Kegiatan</div>
+      <div class="field">
+        <label>Penjelasan Kegiatan Duty</label>
+        <textarea id="dutyKegiatan" placeholder="Jelaskan kegiatan yang dilakukan selama duty..."></textarea>
+      </div>
     </div>
 
-    <!-- MAIN MENU CARDS -->
-    <div class="mx-4 mt-4 grid grid-cols-2 gap-3">
-        <!-- Laporan Duty -->
-        <button onclick="openPanel('duty')" class="menu-btn bg-blue-400 border-4 border-black p-4 text-left brutal-shadow anim-slide anim-delay-2">
-            <div class="text-3xl mb-2 anim-bounce">📝</div>
-            <div class="font-black text-sm uppercase leading-tight">Laporan Duty</div>
-            <div class="text-[10px] font-medium mt-1 opacity-70">Laporan kegiatan harian</div>
-        </button>
-        <!-- Laporan Patroli -->
-        <button onclick="openPanel('patroli')" class="menu-btn bg-orange-400 border-4 border-black p-4 text-left brutal-shadow anim-slide anim-delay-3">
-            <div class="text-3xl mb-2 anim-bounce anim-delay-1">🚨</div>
-            <div class="font-black text-sm uppercase leading-tight">Patroli Rutin</div>
-            <div class="text-[10px] font-medium mt-1 opacity-70">Laporan patroli wilayah</div>
-        </button>
-    </div>
-
-    <!-- IZIN CUTI - CENTER -->
-    <div class="mx-4 mt-3">
-        <button onclick="openPanel('cuti')" class="menu-btn w-full bg-pink-400 border-4 border-black p-4 text-center brutal-shadow anim-slide anim-delay-4">
-            <div class="text-3xl mb-1 inline-block anim-bounce anim-delay-2">🏖️</div>
-            <div class="font-black text-base uppercase">Izin Cuti</div>
-            <div class="text-[11px] font-medium opacity-70">Pengajuan izin & cuti</div>
-        </button>
-    </div>
-
-    <!-- BOTTOM NAV -->
-    <div class="bottom-nav">
-        <button onclick="openPanel('menu')" class="flex flex-col items-center gap-1 text-white menu-btn">
-            <span class="text-xl">☰</span>
-            <span class="text-[9px] font-black uppercase tracking-wider text-yellow-400">MENU</span>
-        </button>
-        <div class="flex items-center">
-            <span class="text-yellow-400 mono text-[10px] font-bold">◆ AKTIF ◆</span>
-        </div>
-        <button onclick="openPanel('gaji')" class="flex flex-col items-center gap-1 text-white menu-btn">
-            <span class="text-xl">💰</span>
-            <span class="text-[9px] font-black uppercase tracking-wider text-yellow-400">GAJI</span>
-        </button>
-    </div>
-
-    <!-- OVERLAY -->
-    <div id="overlay" class="panel-overlay" onclick="closeAllPanels()"></div>
-
-    <!-- ===== PANEL: LAPORAN DUTY ===== -->
-    <div id="panel-duty" class="panel-slide">
-        <div class="panel-header">
-            <span class="font-black text-sm uppercase tracking-wider">📝 Laporan Duty</span>
-            <button onclick="closeAllPanels()" class="text-yellow-400 font-black text-lg">✕</button>
-        </div>
-        <div class="p-5 space-y-4">
-            <div class="anim-slide anim-delay-1">
-                <label class="label-field">Nama Anggota</label>
-                <input type="text" id="duty-nama" class="input-field" placeholder="Otomatis dari akun..." readonly>
-            </div>
-            <div class="anim-slide anim-delay-2">
-                <label class="label-field">Pangkat</label>
-                <input type="text" id="duty-pangkat" class="input-field" placeholder="Masukkan pangkat...">
-            </div>
-            <div class="grid grid-cols-2 gap-3 anim-slide anim-delay-3">
-                <div>
-                    <label class="label-field">Jam Awal Duty</label>
-                    <input type="time" id="duty-jamAwal" class="input-field">
-                </div>
-                <div>
-                    <label class="label-field">Jam Akhir Duty</label>
-                    <input type="time" id="duty-jamAkhir" class="input-field">
-                </div>
-            </div>
-            <div class="anim-slide anim-delay-4">
-                <label class="label-field">Penjelasan Kegiatan Duty</label>
-                <textarea id="duty-kegiatan" class="input-field" rows="4" placeholder="Tuliskan kegiatan selama duty..."></textarea>
-            </div>
-            <div class="anim-slide anim-delay-5">
-                <label class="label-field">Upload Foto Kegiatan (Maks. 3 Foto)</label>
-                <div class="flex gap-3 mt-2">
-                    <div class="photo-slot brutal-shadow-sm" onclick="triggerUpload('duty-foto', 0)" id="duty-slot-0">📷</div>
-                    <div class="photo-slot brutal-shadow-sm" onclick="triggerUpload('duty-foto', 1)" id="duty-slot-1">📷</div>
-                    <div class="photo-slot brutal-shadow-sm" onclick="triggerUpload('duty-foto', 2)" id="duty-slot-2">📷</div>
-                </div>
-                <input type="file" id="duty-foto" accept="image/*" class="hidden" onchange="previewPhoto(this, 'duty')">
-            </div>
-            <button onclick="submitForm('duty')" class="submit-btn anim-slide anim-delay-5">
-                KIRIM LAPORAN DUTY →
-            </button>
-        </div>
-    </div>
-
-    <!-- ===== PANEL: LAPORAN PATROLI ===== -->
-    <div id="panel-patroli" class="panel-slide">
-        <div class="panel-header" style="background:#ea580c;">
-            <span class="font-black text-sm uppercase tracking-wider">🚨 Laporan Patroli Rutin</span>
-            <button onclick="closeAllPanels()" class="text-yellow-400 font-black text-lg">✕</button>
-        </div>
-        <div class="p-5 space-y-4">
-            <div class="anim-slide anim-delay-1">
-                <label class="label-field">Nama Anggota</label>
-                <input type="text" id="patroli-nama" class="input-field" placeholder="Otomatis dari akun..." readonly>
-            </div>
-            <div class="anim-slide anim-delay-2">
-                <label class="label-field">Pangkat</label>
-                <input type="text" id="patroli-pangkat" class="input-field" placeholder="Masukkan pangkat...">
-            </div>
-            <div class="anim-slide anim-delay-3">
-                <label class="label-field">Waktu Patroli</label>
-                <div class="grid grid-cols-4 gap-2 mt-1">
-                    <button onclick="selectWaktu(this, 'pagi')" class="waktu-btn border-3 border-black py-2 text-xs font-black bg-yellow-200 brutal-shadow-sm menu-btn" style="border:3px solid #000;">🌅 PAGI</button>
-                    <button onclick="selectWaktu(this, 'siang')" class="waktu-btn border-3 border-black py-2 text-xs font-black bg-orange-200 brutal-shadow-sm menu-btn" style="border:3px solid #000;">☀️ SIANG</button>
-                    <button onclick="selectWaktu(this, 'sore')" class="waktu-btn border-3 border-black py-2 text-xs font-black bg-purple-200 brutal-shadow-sm menu-btn" style="border:3px solid #000;">🌆 SORE</button>
-                    <button onclick="selectWaktu(this, 'malam')" class="waktu-btn border-3 border-black py-2 text-xs font-black bg-blue-200 brutal-shadow-sm menu-btn" style="border:3px solid #000;">🌙 MALAM</button>
-                </div>
-                <input type="hidden" id="patroli-waktu" value="">
-            </div>
-            <div class="anim-slide anim-delay-4">
-                <label class="label-field">Kegiatan Patroli</label>
-                <textarea id="patroli-kegiatan" class="input-field" rows="4" placeholder="Tuliskan kegiatan patroli..."></textarea>
-            </div>
-            <div class="anim-slide anim-delay-5">
-                <label class="label-field">Upload Foto (Maks. 2 Foto)</label>
-                <div class="flex gap-3 mt-2">
-                    <div class="photo-slot brutal-shadow-sm" onclick="triggerUpload('patroli-foto', 0)" id="patroli-slot-0">📷</div>
-                    <div class="photo-slot brutal-shadow-sm" onclick="triggerUpload('patroli-foto', 1)" id="patroli-slot-1">📷</div>
-                </div>
-                <input type="file" id="patroli-foto" accept="image/*" class="hidden" onchange="previewPhoto(this, 'patroli')">
-            </div>
-            <button onclick="submitForm('patroli')" class="submit-btn anim-slide anim-delay-5" style="box-shadow:4px 4px 0px 0px #ea580c;">
-                KIRIM LAPORAN PATROLI →
-            </button>
-        </div>
-    </div>
-
-    <!-- ===== PANEL: IZIN CUTI ===== -->
-    <div id="panel-cuti" class="panel-slide">
-        <div class="panel-header" style="background:#db2777;">
-            <span class="font-black text-sm uppercase tracking-wider">🏖️ Izin Cuti</span>
-            <button onclick="closeAllPanels()" class="text-yellow-400 font-black text-lg">✕</button>
-        </div>
-        <div class="p-5 space-y-4">
-            <div class="anim-slide anim-delay-1">
-                <label class="label-field">Nama Anggota</label>
-                <input type="text" id="cuti-nama" class="input-field" placeholder="Otomatis dari akun..." readonly>
-            </div>
-            <div class="anim-slide anim-delay-2">
-                <label class="label-field">Pangkat</label>
-                <input type="text" id="cuti-pangkat" class="input-field" placeholder="Masukkan pangkat...">
-            </div>
-            <div class="grid grid-cols-2 gap-3 anim-slide anim-delay-3">
-                <div>
-                    <label class="label-field">Tanggal Mulai Cuti</label>
-                    <input type="date" id="cuti-mulai" class="input-field">
-                </div>
-                <div>
-                    <label class="label-field">Tanggal Berakhir Cuti</label>
-                    <input type="date" id="cuti-akhir" class="input-field">
-                </div>
-            </div>
-            <div class="anim-slide anim-delay-4">
-                <label class="label-field">Alasan Cuti</label>
-                <textarea id="cuti-alasan" class="input-field" rows="4" placeholder="Tuliskan alasan pengajuan cuti..."></textarea>
-            </div>
-            <button onclick="submitForm('cuti')" class="submit-btn anim-slide anim-delay-5" style="box-shadow:4px 4px 0px 0px #db2777;">
-                AJUKAN IZIN CUTI →
-            </button>
-        </div>
-    </div>
-
-    <!-- ===== PANEL: MENU ===== -->
-    <div id="panel-menu" class="panel-slide">
-        <div class="panel-header">
-            <span class="font-black text-sm uppercase tracking-wider">☰ Menu Utama</span>
-            <button onclick="closeAllPanels()" class="text-yellow-400 font-black text-lg">✕</button>
-        </div>
-        <div class="p-5 space-y-3">
-            <button onclick="switchPanel('duty')" class="menu-btn w-full bg-blue-400 border-4 border-black p-4 text-left brutal-shadow flex items-center gap-4 anim-slide anim-delay-1">
-                <span class="text-3xl">📝</span>
-                <div>
-                    <div class="font-black uppercase">Laporan Duty</div>
-                    <div class="text-xs opacity-70">Laporan kegiatan harian anggota</div>
-                </div>
-                <span class="ml-auto font-black">→</span>
-            </button>
-            <button onclick="switchPanel('patroli')" class="menu-btn w-full bg-orange-400 border-4 border-black p-4 text-left brutal-shadow flex items-center gap-4 anim-slide anim-delay-2">
-                <span class="text-3xl">🚨</span>
-                <div>
-                    <div class="font-black uppercase">Laporan Patroli</div>
-                    <div class="text-xs opacity-70">Laporan patroli rutin wilayah</div>
-                </div>
-                <span class="ml-auto font-black">→</span>
-            </button>
-            <button onclick="switchPanel('cuti')" class="menu-btn w-full bg-pink-400 border-4 border-black p-4 text-left brutal-shadow flex items-center gap-4 anim-slide anim-delay-3">
-                <span class="text-3xl">🏖️</span>
-                <div>
-                    <div class="font-black uppercase">Izin Cuti</div>
-                    <div class="text-xs opacity-70">Pengajuan izin dan cuti</div>
-                </div>
-                <span class="ml-auto font-black">→</span>
-        
+    <!-- Upload Foto -->
+    <div class="form-card panel-anim-4">
+      <div class="form-card-title"><span>📸</span> Foto Kegiatan (maks. 3 foto)</div>
+      <div class="upload-area" onclick="document.getElementById('dutyFotoInput').click()">
+        <input type="file" id="dutyFotoInput" accept="image/*" multiple onchange="handleUpload(this,'dutyPreviews',3)">
+        <div class="up-icon">📷</div>
+        <div class="up-text">Ketuk untuk upload foto</div>
+        <div style="font-size:9px;color:#9ca3af;font-weight:600;">JPG / PNG • M
