@@ -57,8 +57,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
 <div style="background:linear-gradient(180deg,#0d1f0d,#0a0e0a);border-bottom:1px solid #2d6e2d;padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30;">
   <button onclick="goBack()" class="back-btn">← KEMBALI</button>
   <div style="width:1px;height:24px;background:#2d6e2d;"></div>
-  
-  <!-- DISCORD USER DISPLAY -->
   <div id="discordUser" style="display:flex;align-items:center;gap:10px;opacity:0;" class="anim-up d1">
     <img id="userAvatar" src="" alt="Avatar" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--green);object-fit:cover;">
     <div>
@@ -66,7 +64,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
       <div class="mono" style="color:rgba(0,255,65,0.3);font-size:8px;letter-spacing:0.1em;">DISCORD MEMBER</div>
     </div>
   </div>
-  
   <div style="width:1px;height:24px;background:#2d6e2d;"></div>
   <div>
     <div class="oswald" style="color:var(--green);font-size:16px;font-weight:700;letter-spacing:0.08em;text-shadow:0 0 10px var(--green);">☰ MENU UTAMA</div>
@@ -77,7 +74,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
 <div style="padding:12px;">
   <div class="mono" style="color:rgba(0,255,65,0.3);font-size:9px;letter-spacing:0.2em;margin-bottom:10px;">▶ PILIH MENU OPERASIONAL</div>
 
-  <!-- MENU 1: LOCAL -->
   <div class="menu-item anim-up d1" onclick="redirectTo('laporan-duty.html')" style="border-color:#1e4d7b;">
     <div style="width:44px;height:44px;background:rgba(30,77,123,0.2);border:1px solid #1e4d7b;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📋</div>
     <div>
@@ -87,7 +83,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
     <div class="menu-arrow" style="color:#4da6ff;">→</div>
   </div>
 
-  <!-- MENU 2: LOCAL -->
   <div class="menu-item anim-up d2" onclick="redirectTo('laporan-patroli.html')" style="border-color:#7b3a1e;">
     <div style="width:44px;height:44px;background:rgba(123,58,30,0.2);border:1px solid #7b3a1e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🚔</div>
     <div>
@@ -97,7 +92,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
     <div class="menu-arrow" style="color:#ff8c4d;">→</div>
   </div>
 
-  <!-- MENU 3: LOCAL -->
   <div class="menu-item anim-up d3" onclick="redirectTo('izin-cuti.html')" style="border-color:#7b1e4d;">
     <div style="width:44px;height:44px;background:rgba(123,30,77,0.2);border:1px solid #7b1e4d;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🏖️</div>
     <div>
@@ -107,7 +101,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
     <div class="menu-arrow" style="color:#ff4da6;">→</div>
   </div>
 
-  <!-- MENU 4: LOCAL -->
   <div class="menu-item anim-up d4" onclick="redirectTo('gaji.html')" style="border-color:rgba(255,215,0,0.3);">
     <div style="width:44px;height:44px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💰</div>
     <div>
@@ -117,7 +110,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
     <div class="menu-arrow" style="color:#ffd700;">→</div>
   </div>
 
-  <!-- MENU 5: EXTERNAL - ZOOM -->
   <div class="menu-item anim-up d5" onclick="redirectTo('https://zoom.us/j/123456789012')" style="border-color:#1e7b3a;">
     <div style="width:44px;height:44px;background:rgba(30,123,58,0.2);border:1px solid #1e7b3a;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🎥</div>
     <div>
@@ -127,7 +119,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
     <div class="menu-arrow" style="color:#4dff8c;">→</div>
   </div>
 
-  <!-- MENU 6: EXTERNAL - GOOGLE DRIVE -->
   <div class="menu-item anim-up d6" onclick="redirectTo('https://drive.google.com/drive/folders/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef')" style="border-color:#7b5a1e;">
     <div style="width:44px;height:44px;background:rgba(123,90,30,0.2);border:1px solid #7b5a1e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📁</div>
     <div>
@@ -137,7 +128,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
     <div class="menu-arrow" style="color:#ffd74d;">→</div>
   </div>
 
-  <!-- MENU 7: EXTERNAL - DISCORD -->
   <div class="menu-item anim-up d7" onclick="redirectTo('https://discord.gg/mdtserverinvite')" style="border-color:#7b1e7b;">
     <div style="width:44px;height:44px;background:rgba(123,30,123,0.2);border:1px solid #7b1e7b;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💬</div>
     <div>
@@ -147,7 +137,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
     <div class="menu-arrow" style="color:#d74dff;">→</div>
   </div>
 
-  <!-- MENU 8: EXTERNAL - YOUTUBE -->
   <div class="menu-item anim-up d8" onclick="redirectTo('https://youtube.com/@mdtofficialchannel')" style="border-color:#ff1e1e;">
     <div style="width:44px;height:44px;background:rgba(255,30,30,0.2);border:1px solid #ff1e1e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">▶️</div>
     <div>
@@ -159,8 +148,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-li
 
 </div>
 
-<script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SUPABASE_URL = "https://iejyusqakqrcavzbscqz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imllanl1c3Fha3FyY2F2emJzY3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NjQ2OTgsImV4cCI6MjA5NjM0MDY5OH0._z6Owi73t6G8h4He4Vmglgz4gV0eJlIyq9j6dZMAGtM";
@@ -168,23 +156,27 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function goBack(){document.getElementById('loadingScreen').classList.add('active');setTimeout(()=>window.location.href='dashboard.html',1500);}
-
-function redirectTo(page){
+function goBack() {
   document.getElementById('loadingScreen').classList.add('active');
-  setTimeout(()=>{
-    if(page.startsWith('http://') || page.startsWith('https://')){
+  setTimeout(() => window.location.href = 'dashboard.html', 1500);
+}
+
+function redirectTo(page) {
+  document.getElementById('loadingScreen').classList.add('active');
+  setTimeout(() => {
+    if (page.startsWith('http://') || page.startsWith('https://')) {
       window.open(page, '_blank');
     } else {
       window.location.href = page;
     }
-  },1500);
+  }, 1500);
 }
 
 async function fetchDiscordUser() {
   try {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) {
+      console.log('No session - redirect to login');
       window.location.href = 'index.html';
       return;
     }
@@ -194,6 +186,7 @@ async function fetchDiscordUser() {
     document.getElementById('userAvatar').src = avatarUrl;
     document.getElementById('userName').textContent = username;
     document.getElementById('discordUser').style.opacity = '1';
+    console.log('User loaded:', username);
   } catch (error) {
     console.error('Error:', error);
   }
@@ -201,6 +194,5 @@ async function fetchDiscordUser() {
 
 fetchDiscordUser();
 </script>
-
 </body>
 </html>
