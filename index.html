@@ -26,6 +26,7 @@
     #loading-overlay.hidden {
       opacity: 0;
       pointer-events: none;
+      visibility: hidden;
     }
 
     .loading-emblem {
@@ -284,45 +285,9 @@
     .back { background: #475569; box-shadow: none; margin-top: 12px; }
     .back:hover { background: #334155; }
 
-    /* Divider */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 20px 0;
-      color: #334155;
-      font-size: 11px;
-      letter-spacing: 2px;
-    }
 
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #1e293b;
-    }
 
-    /* Discord Login Button */
-    .btn-discord {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      background: #5865F2;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 16px rgba(88,101,242,0.3);
-    }
 
-    .btn-discord:hover { background: #4752C4; transform: translateY(-1px); }
 
     /* Footer */
     .footer {
@@ -386,6 +351,105 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* Photo Upload */
+    .foto-upload-area {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .foto-slot {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      border: 2px dashed #475569;
+      background: #0f172a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .foto-slot:hover { border-color: #38bdf8; background: #1e3a5f; }
+
+    .foto-slot.has-foto { border: 2px solid #2563eb; }
+
+    .foto-slot input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .foto-slot img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .foto-slot .slot-label {
+      font-size: 10px;
+      color: #64748b;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .foto-slot .slot-icon {
+      font-size: 22px;
+      margin-bottom: 4px;
+      z-index: 1;
+    }
+
+    .foto-slot .hapus-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      background: #ef4444;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      z-index: 10;
+      cursor: pointer;
+      border: none;
+      color: white;
+      padding: 0;
+      line-height: 1;
+      width: 22px;
+      margin: 0;
+    }
+
+    .foto-slot.has-foto .hapus-btn { display: flex; }
+    .foto-slot.has-foto .slot-icon,
+    .foto-slot.has-foto .slot-label { display: none; }
+
+    .foto-count {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 8px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .foto-count span { color: #38bdf8; font-weight: bold; }
+
     /* Section header info */
     .info-row {
       display: flex;
@@ -401,10 +465,7 @@
     .info-label { font-size: 12px; color: #64748b; flex: 1; text-transform: uppercase; letter-spacing: 1px; }
     .info-val { font-size: 13px; color: #e2e8f0; font-weight: 600; }
 
-    /* Auth state: logged out */
-    #auth-section { display: none; }
-    body.not-logged #auth-section { display: block; }
-    body.not-logged #main-menu { display: none; }
+
   </style>
 </head>
 <body>
@@ -422,7 +483,7 @@
         <circle cx="40" cy="40" r="4" fill="#2563eb"/>
       </svg>
     </div>
-    <div class="loading-title">SABAR LOADING</div>
+    <div class="loading-title">PERSONEL TERMINAL</div>
     <div class="loading-label">TENTARA AD · SISTEM TERPADU</div>
     <div class="loading-bar-wrap">
       <div class="loading-bar" id="boot-bar"></div>
@@ -444,7 +505,7 @@
   <!-- HOME PAGE -->
   <div class="page active" id="home">
     <div class="container">
-      <div class="title"><span class="title-badge"></span>LAPORAN<span class="title-badge"></span></div>
+      <div class="title"><span class="title-badge"></span>PERSONEL TERMINAL<span class="title-badge"></span></div>
 
       <!-- Profile Card -->
       <div class="box profile-card" style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:20px;">
@@ -454,14 +515,7 @@
         <div id="user-tag" style="font-size:12px; color:#64748b; letter-spacing:1px;"></div>
         <div class="profile-status"><span class="status-dot"></span>AKTIF BERTUGAS</div>
 
-        <!-- Section: not logged in -->
-        <div id="auth-section" style="width:100%; margin-top:4px;">
-          <div class="divider">LOGIN UNTUK MELANJUTKAN</div>
-          <button class="btn-discord" onclick="loginDiscord()">
-            <svg width="20" height="20" viewBox="0 0 71 55" fill="white"><path d="M60.1 4.9A58.6 58.6 0 0 0 45.6.9a40 40 0 0 0-1.8 3.6 54.2 54.2 0 0 0-16.3 0A38.7 38.7 0 0 0 25.7.9 58.5 58.5 0 0 0 10.9 5C1.6 18.5-1 31.7.3 44.7a59 59 0 0 0 18 9.1 44.9 44.9 0 0 0 3.9-6.3 38.4 38.4 0 0 1-6.1-2.9l1.5-1.1A42 42 0 0 0 35.5 47a42 42 0 0 0 17.9-3.5l1.5 1.1a38.4 38.4 0 0 1-6.1 2.9 44.9 44.9 0 0 0 3.9 6.3 58.8 58.8 0 0 0 18-9.1C71.8 29.8 68 16.7 60.1 4.9ZM23.7 37c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
-            LOGIN DENGAN DISCORD
-          </button>
-        </div>
+
       </div>
 
       <!-- Main Menu -->
@@ -521,8 +575,31 @@
       <textarea id="kegiatanDuty" placeholder="Tuliskan detail kegiatan Duty Anda..."></textarea>
 
       <div class="box">
-        <label>📎 Upload Bukti Foto</label>
-        <input type="file" id="fotoDuty" style="margin-bottom:0; padding:8px;">
+        <label>📎 Bukti Foto (Maks. 3 Foto)</label>
+        <div class="foto-upload-area">
+          <div class="foto-slot" id="slotDuty1">
+            <input type="file" id="fotoDuty1" accept="image/*" onchange="previewFoto(this,'slotDuty1','countDuty')">
+            <span class="slot-icon">📷</span>
+            <span class="slot-label">Foto 1</span>
+            <img id="prevDuty1" src="" alt="">
+            <button class="hapus-btn" onclick="hapusFoto(event,'fotoDuty1','prevDuty1','slotDuty1','countDuty')">✕</button>
+          </div>
+          <div class="foto-slot" id="slotDuty2">
+            <input type="file" id="fotoDuty2" accept="image/*" onchange="previewFoto(this,'slotDuty2','countDuty')">
+            <span class="slot-icon">📷</span>
+            <span class="slot-label">Foto 2</span>
+            <img id="prevDuty2" src="" alt="">
+            <button class="hapus-btn" onclick="hapusFoto(event,'fotoDuty2','prevDuty2','slotDuty2','countDuty')">✕</button>
+          </div>
+          <div class="foto-slot" id="slotDuty3">
+            <input type="file" id="fotoDuty3" accept="image/*" onchange="previewFoto(this,'slotDuty3','countDuty')">
+            <span class="slot-icon">📷</span>
+            <span class="slot-label">Foto 3</span>
+            <img id="prevDuty3" src="" alt="">
+            <button class="hapus-btn" onclick="hapusFoto(event,'fotoDuty3','prevDuty3','slotDuty3','countDuty')">✕</button>
+          </div>
+        </div>
+        <div class="foto-count" id="countDuty"><span>0</span> / 3 foto dipilih</div>
       </div>
 
       <button onclick="kirimDuty()">⬆ KIRIM LAPORAN</button>
@@ -565,95 +642,32 @@
       <textarea id="hasilPatroli" placeholder="Tuliskan hasil atau situasi area patroli..."></textarea>
 
       <div class="box">
-        <label>📎 Upload Bukti Foto</label>
-        <input type="file" id="fotoPatroli" accept="image/*" style="margin-bottom:0; padding:8px;">
+        <label>📎 Bukti Foto (Maks. 3 Foto)</label>
+        <div class="foto-upload-area">
+          <div class="foto-slot" id="slotPatroli1">
+            <input type="file" id="fotoPatroli1" accept="image/*" onchange="previewFoto(this,'slotPatroli1','countPatroli')">
+            <span class="slot-icon">📷</span>
+            <span class="slot-label">Foto 1</span>
+            <img id="prevPatroli1" src="" alt="">
+            <button class="hapus-btn" onclick="hapusFoto(event,'fotoPatroli1','prevPatroli1','slotPatroli1','countPatroli')">✕</button>
+          </div>
+          <div class="foto-slot" id="slotPatroli2">
+            <input type="file" id="fotoPatroli2" accept="image/*" onchange="previewFoto(this,'slotPatroli2','countPatroli')">
+            <span class="slot-icon">📷</span>
+            <span class="slot-label">Foto 2</span>
+            <img id="prevPatroli2" src="" alt="">
+            <button class="hapus-btn" onclick="hapusFoto(event,'fotoPatroli2','prevPatroli2','slotPatroli2','countPatroli')">✕</button>
+          </div>
+          <div class="foto-slot" id="slotPatroli3">
+            <input type="file" id="fotoPatroli3" accept="image/*" onchange="previewFoto(this,'slotPatroli3','countPatroli')">
+            <span class="slot-icon">📷</span>
+            <span class="slot-label">Foto 3</span>
+            <img id="prevPatroli3" src="" alt="">
+            <button class="hapus-btn" onclick="hapusFoto(event,'fotoPatroli3','prevPatroli3','slotPatroli3','countPatroli')">✕</button>
+          </div>
+        </div>
+        <div class="foto-count" id="countPatroli"><span>0</span> / 3 foto dipilih</div>
       </div>
 
       <button onclick="kirimPatroli()">⬆ KIRIM LAPORAN</button>
-      <button class="back" onclick="showPage('home', 'KEMBALI...')">↩ KEMBALI</button>
-    </div>
-  </div>
-
-  <!-- CUTI PAGE -->
-  <div class="page" id="cuti">
-    <div class="container">
-      <div class="title"><span class="title-badge"></span>IZIN CUTI<span class="title-badge"></span></div>
-
-      <div class="box" style="margin-bottom:20px;">
-        <div class="info-row">
-          <span class="info-label">Pemohon</span>
-          <span class="info-val" id="cuti-pemohon">—</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Status</span>
-          <span class="info-val" style="color:#f59e0b;">● MENUNGGU ACC</span>
-        </div>
-      </div>
-
-      <label>Nama Lengkap</label>
-      <input type="text" id="namaCuti" placeholder="Masukkan nama lengkap">
-
-      <label>Pangkat / Jabatan</label>
-      <input type="text" id="pangkatCuti" placeholder="Contoh: Kopda / Anggota">
-
-      <div class="box">
-        <label>Tanggal Mulai Cuti</label>
-        <input type="date" id="awalCuti" style="margin-bottom:0;">
-      </div>
-      <div class="box">
-        <label>Tanggal Berakhir Cuti</label>
-        <input type="date" id="akhirCuti" style="margin-bottom:0;">
-      </div>
-
-      <label>Alasan Pengajuan</label>
-      <textarea id="alasanCuti" placeholder="Tuliskan alasan pengajuan cuti..."></textarea>
-
-      <button onclick="kirimCuti()">📨 AJUKAN CUTI</button>
-      <button class="back" onclick="showPage('home', 'KEMBALI...')">↩ KEMBALI</button>
-    </div>
-  </div>
-
-  <!-- GAJI PAGE -->
-  <div class="page" id="gaji">
-    <div class="container">
-      <div class="title"><span class="title-badge"></span>PENGAMBILAN GAJI<span class="title-badge"></span></div>
-
-      <div class="box" style="margin-bottom:20px; border-left: 4px solid #10b981;">
-        <div class="info-row">
-          <span class="info-label">Penerima</span>
-          <span class="info-val" id="gaji-penerima">—</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Periode</span>
-          <span class="info-val" id="gaji-periode">—</span>
-        </div>
-      </div>
-
-      <label>Nama Lengkap</label>
-      <input type="text" id="namaGaji" placeholder="Masukkan nama lengkap">
-
-      <label>Pangkat / Jabatan</label>
-      <input type="text" id="pangkatGaji" placeholder="Contoh: Pratu / Anggota">
-
-      <div class="box">
-        <label>Tanggal Pengambilan</label>
-        <input type="date" id="tanggalGaji" style="margin-bottom:0;">
-      </div>
-
-      <label>Total Gaji (Rp)</label>
-      <input type="number" id="jumlahGaji" placeholder="Masukkan nominal gaji">
-
-      <button onclick="kirimGaji()">💰 KONFIRMASI PENGAMBILAN</button>
-      <button class="back" onclick="showPage('home', 'KEMBALI...')">↩ KEMBALI</button>
-    </div>
-  </div>
-
-  <!-- FOOTER NAV -->
-  <div class="footer">
-    <div id="nav-laporan" class="active-nav" onclick="showPage('home', 'MEMUAT...')">📋 LAPORAN</div>
-    <div id="nav-gaji" onclick="showPage('gaji', 'MEMUAT GAJI...')">💰 GAJI</div>
-  </div>
-
-  <script>
-    /* ========== BOOT LOADING ANIMATION ========== */
-    const bootBar = document.getElementById
+      <button class="back" onclick="showPage(
