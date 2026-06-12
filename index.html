@@ -1,321 +1,319 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Futuristic Tentara</title>
+    <title>Official MDT - Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
-        * { font-family: 'Space Grotesk', sans-serif; }
-        .mono { font-family: 'Space Mono', monospace; }
-        .brutal-shadow { box-shadow: 5px 5px 0px 0px #000; }
-        .brutal-shadow-sm { box-shadow: 3px 3px 0px 0px #000; }
-        .brutal-shadow-lg { box-shadow: 8px 8px 0px 0px #000; }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
-            50% { transform: scale(1.1) rotate(3deg); }
-            70% { transform: scale(0.95) rotate(-2deg); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-        .anim-bounce { animation: bounceIn 0.5s ease forwards; }
-        .anim-slide { animation: slideUp 0.4s ease forwards; }
-        .anim-delay-1 { animation-delay: 0.05s; opacity: 0; }
-        .anim-delay-2 { animation-delay: 0.1s; opacity: 0; }
-        .anim-delay-3 { animation-delay: 0.15s; opacity: 0; }
-        .anim-delay-4 { animation-delay: 0.2s; opacity: 0; }
-
-        .menu-btn:active { transform: translate(3px,3px); box-shadow: none !important; }
-        .menu-btn { transition: all 0.1s; }
-
-        /* ===== LOADING SCREEN BIRU KUNING ===== */
-        .loading-screen {
-            position: fixed; inset: 0; z-index: 999;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 16px;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.25s ease;
-            overflow: hidden;
-        }
-        .loading-screen.active { opacity: 1; pointer-events: all; }
-
-        /* Gradient background animasi */
-        .loading-bg {
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, #1e3a8a, #1d4ed8, #0ea5e9, #1e3a8a);
-            background-size: 400% 400%;
-            animation: gradientShift 2s ease infinite;
-        }
-        @keyframes gradientShift {
-            0%   { background-position: 0% 50%; }
-            50%  { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Grid garis militer */
-        .loading-grid {
-            position: absolute; inset: 0;
-            background-image:
-                linear-gradient(rgba(251,191,36,0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(251,191,36,0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        /* Bintang sudut */
-        .corner-star {
-            position: absolute;
-            font-size: 32px;
-            opacity: 0.3;
-            animation: rotateStar 4s linear infinite;
-        }
-        .corner-star:nth-child(1) { top: 20px; left: 20px; }
-        .corner-star:nth-child(2) { top: 20px; right: 20px; animation-direction: reverse; }
-        .corner-star:nth-child(3) { bottom: 80px; left: 20px; animation-delay: 1s; }
-        .corner-star:nth-child(4) { bottom: 80px; right: 20px; animation-delay: 2s; }
-        @keyframes rotateStar { from { transform: rotate(0); } to { transform: rotate(360deg); } }
-
-        /* Logo spinner tengah */
-        .loading-ring-outer {
-            position: relative; z-index: 2;
-            width: 90px; height: 90px;
-            border: 5px solid rgba(251,191,36,0.3);
-            border-top: 5px solid #fbbf24;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        .loading-ring-inner {
-            position: absolute; inset: 10px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-bottom: 4px solid #fff;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite reverse;
-        }
-        .loading-icon-center {
-            position: absolute; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .loading-title {
-            position: relative; z-index: 2;
-            color: #fbbf24;
-            font-family: 'Space Mono', monospace;
-            font-weight: 700; font-size: 20px;
-            letter-spacing: 0.12em; text-transform: uppercase;
-            animation: textPulse 0.8s ease infinite;
-            text-shadow: 0 0 20px rgba(251,191,36,0.6);
-        }
-        @keyframes textPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(0.97); }
-        }
-
-        .loading-sub {
-            position: relative; z-index: 2;
-            color: rgba(255,255,255,0.6);
-            font-size: 11px; font-weight: 600;
-            letter-spacing: 0.2em; text-transform: uppercase;
-        }
-
-        .loading-dots {
-            position: relative; z-index: 2;
-            display: flex; gap: 8px;
-        }
-        .loading-dots span {
-            width: 10px; height: 10px;
-            background: #fbbf24;
-            border-radius: 50%;
-            border: 2px solid #000;
-        }
-        .loading-dots span:nth-child(1) { animation: dotBounce 0.9s ease infinite 0s; }
-        .loading-dots span:nth-child(2) { animation: dotBounce 0.9s ease infinite 0.15s; }
-        .loading-dots span:nth-child(3) { animation: dotBounce 0.9s ease infinite 0.3s; }
-        @keyframes dotBounce {
-            0%,100% { transform: translateY(0); background: #fbbf24; }
-            50% { transform: translateY(-12px); background: #fff; }
-        }
-
-        /* Progress bar */
-        .loading-bar-wrap {
-            position: relative; z-index: 2;
-            width: 200px; height: 8px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid #fbbf24;
-        }
-        .loading-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #fbbf24, #fff, #fbbf24);
-            background-size: 200% 100%;
-            animation: barSlide 1s ease infinite;
-        }
-        @keyframes barSlide {
-            0% { width: 0%; }
-            50% { width: 100%; }
-            100% { width: 0%; }
-        }
-
-        /* Badge militer */
-        .loading-badge {
-            position: relative; z-index: 2;
-            background: rgba(251,191,36,0.15);
-            border: 2px solid #fbbf24;
-            padding: 4px 12px;
-            color: #fbbf24;
-            font-size: 10px; font-weight: 700;
-            letter-spacing: 0.15em; text-transform: uppercase;
-        }
+        .brutal-shadow { box-shadow: 6px 6px 0px 0px #000000; }
+        .btn-shadow { box-shadow: 4px 4px 0px 0px #000000; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body class="bg-[#dbeafe] min-h-screen pb-24">
+<body class="bg-[#dbeafe] flex justify-center items-center min-h-screen p-4 font-sans">
 
-    <!-- LOADING SCREEN -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loading-bg"></div>
-        <div class="loading-grid"></div>
-        <span class="corner-star">⭐</span>
-        <span class="corner-star">⭐</span>
-        <span class="corner-star">⭐</span>
-        <span class="corner-star">⭐</span>
-        <div class="loading-badge">FUTURISTIC TENTARA MDT</div>
-        <div class="loading-ring-outer">
-            <div class="loading-ring-inner"></div>
-            <div class="loading-icon-center">🎖️</div>
+    <div id="loadingScreen" class="fixed inset-0 bg-yellow-400 border-8 border-black z-50 flex flex-col justify-center items-center p-4">
+        <div class="bg-white border-4 border-black p-6 brutal-shadow text-center max-w-xs w-full">
+            <div class="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4 bg-cyan-300"></div>
+            <h2 class="font-black text-xl tracking-wider uppercase">MEMUAT DATA...</h2>
+            <p class="text-xs font-mono mt-1 text-gray-700">MDT_SYSTEM_LOADING</p>
         </div>
-        <p class="loading-title">Sabar lagi loading...</p>
-        <div class="loading-dots"><span></span><span></span><span></span></div>
-        <div class="loading-bar-wrap"><div class="loading-bar-fill"></div></div>
-        <p class="loading-sub">Memuat halaman</p>
     </div>
 
-    <!-- TOP BAR -->
-    <div class="bg-yellow-400 border-b-4 border-black px-4 py-3 flex justify-between items-center sticky top-0 z-30">
-        <div class="flex items-center gap-2">
-            <span class="mono font-bold text-xs">MDT v2.1</span>
-            <div class="w-2 h-2 bg-green-500 border-2 border-black rounded-full animate-pulse"></div>
-            <span class="text-[10px] font-bold text-green-700">ONLINE</span>
+    <div class="w-full max-w-md bg-[#fafafa] border-4 border-black brutal-shadow rounded-sm overflow-hidden flex flex-col justify-between p-6 relative" style="min-height: 680px;">
+        
+        <div class="flex justify-between items-center border-b-4 border-black pb-2 bg-yellow-400 -mx-6 -mt-6 p-3">
+            <span class="font-black text-xs tracking-wider">MDT COMMAND CENTER V2.1</span>
+            <button id="logoutBtn" class="bg-red-500 text-white border-2 border-black px-2 py-0.5 text-[10px] font-black btn-shadow active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer uppercase">LOGOUT</button>
         </div>
-        <span class="mono font-black text-xs tracking-wider">FUTURISTIC_ONTOP</span>
-    </div>
 
-    <!-- PROFILE CARD -->
-    <div class="mx-4 mt-4 bg-white border-4 border-black brutal-shadow-lg p-4 flex items-center gap-4 anim-slide">
-        <div class="relative">
-            <div class="w-16 h-16 border-4 border-black bg-purple-200 overflow-hidden brutal-shadow">
-                <img id="userAvatar" src="https://via.placeholder.com/64" alt="Avatar" class="w-full h-full object-cover">
+        <div class="bg-emerald-200 border-4 border-black p-3 my-4 flex items-center gap-4 btn-shadow">
+            <div class="w-14 h-14 border-4 border-black bg-white overflow-hidden shrink-0">
+                <img id="userAvatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-full h-full object-cover">
             </div>
-            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-black rounded-full"></div>
+            <div class="overflow-hidden">
+                <div class="text-[10px] font-mono uppercase text-emerald-800 font-bold tracking-wider">PERSONEL TERDETEKSI:</div>
+                <h2 id="userName" class="text-xl font-black tracking-tight uppercase truncate">MEMUAT...</h2>
+                <span class="bg-black text-white text-[9px] font-mono px-1.5 py-0.5 uppercase">AUTHENTICATED</span>
+            </div>
         </div>
-        <div class="flex-1">
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Selamat datang,</p>
-            <h2 id="userName" class="text-lg font-black leading-tight">Loading...</h2>
-            <p id="userEmail" class="text-[11px] text-gray-500 font-medium">--</p>
-        </div>
-        <button onclick="handleLogout()" class="bg-red-400 px-3 py-2 text-[10px] font-black uppercase brutal-shadow-sm menu-btn" style="border:3px solid #000;">KELUAR</button>
-    </div>
 
-    <!-- QUICK STATUS -->
-    <div class="mx-4 mt-3 grid grid-cols-3 gap-2">
-        <div class="bg-cyan-300 border-4 border-black p-3 text-center brutal-shadow anim-slide anim-delay-1">
-            <div class="text-2xl">📋</div>
-            <div class="text-[10px] font-black uppercase mt-1">Laporan</div>
-        </div>
-        <div class="bg-green-300 border-4 border-black p-3 text-center brutal-shadow anim-slide anim-delay-2">
-            <div class="text-2xl">🚔</div>
-            <div class="text-[10px] font-black uppercase mt-1">Patroli</div>
-        </div>
-        <div class="bg-pink-300 border-4 border-black p-3 text-center brutal-shadow anim-slide anim-delay-3">
-            <div class="text-2xl">🏖️</div>
-            <div class="text-[10px] font-black uppercase mt-1">Cuti</div>
-        </div>
-    </div>
+        <div class="flex-grow my-2">
+            
+            <div id="tab-home" class="tab-content active space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="openForm('form-duty')" class="bg-cyan-300 border-4 border-black p-4 font-black text-sm tracking-wider uppercase text-left btn-shadow active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer flex flex-col justify-between h-24">
+                        <span>📋 LAPORAN DUTY</span>
+                        <span class="text-[10px] font-mono font-normal lowercase bg-white border border-black px-1 self-start">buka tab</span>
+                    </button>
+                    <button onclick="openForm('form-patroli')" class="bg-orange-300 border-4 border-black p-4 font-black text-sm tracking-wider uppercase text-left btn-shadow active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer flex flex-col justify-between h-24">
+                        <span>🚨 LAPORAN PATROLI</span>
+                        <span class="text-[10px] font-mono font-normal lowercase bg-white border border-black px-1 self-start">buka tab</span>
+                    </button>
+                    <button onclick="openForm('form-gaji')" class="bg-lime-300 border-4 border-black p-4 font-black text-sm tracking-wider uppercase text-left btn-shadow active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer flex flex-col justify-between h-24">
+                        <span>💵 AMBIL GAJI</span>
+                        <span class="text-[10px] font-mono font-normal lowercase bg-white border border-black px-1 self-start">buka tab</span>
+                    </button>
+                    <button onclick="openForm('form-cuti')" class="bg-pink-300 border-4 border-black p-4 font-black text-sm tracking-wider uppercase text-left btn-shadow active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer flex flex-col justify-between h-24">
+                        <span>🌴 IZIN CUTI</span>
+                        <span class="text-[10px] font-mono font-normal lowercase bg-white border border-black px-1 self-start">buka tab</span>
+                    </button>
+                </div>
+                
+                <div class="bg-stone-200 border-4 border-black p-3 text-center btn-shadow">
+                    <p class="text-[10px] font-bold uppercase tracking-wide text-stone-700"> Silahkan pilih modul di atas untuk melakukan input data.</p>
+                </div>
+            </div>
 
-    <!-- MAIN MENU CARDS -->
-    <div class="mx-4 mt-4 grid grid-cols-2 gap-3">
-        <button onclick="goTo('laporan-duty.html')" class="menu-btn bg-blue-400 border-4 border-black p-4 text-left brutal-shadow anim-slide anim-delay-2">
-            <div class="text-3xl mb-2">📝</div>
-            <div class="font-black text-sm uppercase leading-tight">Laporan Duty</div>
-            <div class="text-[10px] font-medium mt-1 opacity-70">Laporan kegiatan harian</div>
-        </button>
-        <button onclick="goTo('laporan-patroli.html')" class="menu-btn bg-orange-400 border-4 border-black p-4 text-left brutal-shadow anim-slide anim-delay-3">
-            <div class="text-3xl mb-2">🚨</div>
-            <div class="font-black text-sm uppercase leading-tight">Patroli Rutin</div>
-            <div class="text-[10px] font-medium mt-1 opacity-70">Laporan patroli wilayah</div>
-        </button>
-    </div>
+            <div id="tab-buku" class="tab-content space-y-3">
+                <div class="bg-white border-4 border-black p-4 brutal-shadow max-h-[340px] overflow-y-auto space-y-4">
+                    <div>
+                        <h3 class="font-black text-md border-b-2 border-black pb-1 text-red-600 uppercase">⚠️ PERATURAN UTAMA</h3>
+                        <ol class="list-decimal list-inside text-xs font-bold mt-2 space-y-1 text-stone-800">
+                            <li>DILARANG MENYALAHGUNAKAN WEWENANG MDT.</li>
+                            <li>SEMUA LAPORAN YANG MASUK AKAN DIARSIP SECARA PERMANEN.</li>
+                            <li>PEMALSUAN DATA AKAN DIBAWA KE POLISI MILITER.</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-md border-b-2 border-black pb-1 text-blue-600 uppercase">📘 STANDAR OPERASIONAL (SOP)</h3>
+                        <p class="text-xs font-medium mt-2 leading-relaxed text-stone-700">
+                            Setiap personel wajib mengaktifkan Laporan Duty saat memulai jam dinas dan menutupnya kembali saat selesai. Dokumentasi foto wajib melampirkan tanda bukti visual yang jelas tanpa rekayasa.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    <!-- IZIN CUTI -->
-    <div class="mx-4 mt-3">
-        <button onclick="goTo('izin-cuti.html')" class="menu-btn w-full bg-pink-400 border-4 border-black p-4 text-center brutal-shadow anim-slide anim-delay-4">
-            <div class="text-3xl mb-1 inline-block">🏖️</div>
-            <div class="font-black text-base uppercase">Izin Cuti</div>
-            <div class="text-[11px] font-medium opacity-70">Pengajuan izin & cuti</div>
-        </button>
-    </div>
+            <div id="form-duty" class="hidden bg-white border-4 border-black p-4 btn-shadow max-h-[360px] overflow-y-auto space-y-3">
+                <div class="flex justify-between items-center bg-cyan-300 border-2 border-black p-1.5 -mx-4 -mt-4 mb-2">
+                    <span class="font-black text-xs uppercase">INPUT LAPORAN DUTY</span>
+                    <button onclick="closeForm('form-duty')" class="bg-red-500 text-white font-black px-1 text-xs border border-black">X</button>
+                </div>
+                <input type="text" placeholder="NAMA" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50 input-nama">
+                <input type="text" placeholder="PANGKAT" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[9px] font-black block">JAM AWAL</label>
+                        <input type="time" class="w-full border-2 border-black p-1 text-xs font-bold rounded-none bg-stone-50">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black block">JAM AKHIR</label>
+                        <input type="time" class="w-full border-2 border-black p-1 text-xs font-bold rounded-none bg-stone-50">
+                    </div>
+                </div>
+                <textarea placeholder="KOLOM KEGIATAN DUTY" rows="2" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50"></textarea>
+                <div>
+                    <label class="text-[9px] font-black block mb-1">UPLOAD FOTO (MAKSIMAL 3)</label>
+                    <input type="file" multiple accept="image/*" class="w-full text-xs font-mono border border-dashed border-black p-1" onchange="validateFiles(this, 3)">
+                </div>
+                <button class="w-full bg-black text-white text-xs font-black py-2 uppercase tracking-widest active:bg-stone-800">KIRIM LAPORAN</button>
+            </div>
 
-    <!-- BOTTOM NAV -->
-    <div class="fixed bottom-0 left-0 right-0 bg-black border-t-4 border-yellow-400 flex justify-between px-6 py-2 z-40">
-        <button onclick="goTo('menu.html')" class="flex flex-col items-center gap-1 text-white menu-btn">
-            <span class="text-xl">☰</span>
-            <span class="text-[9px] font-black uppercase tracking-wider text-yellow-400">MENU</span>
-        </button>
-        <div class="flex items-center">
-            <span class="text-yellow-400 mono text-[10px] font-bold">◆ AKTIF ◆</span>
+            <div id="form-patroli" class="hidden bg-white border-4 border-black p-4 btn-shadow max-h-[360px] overflow-y-auto space-y-3">
+                <div class="flex justify-between items-center bg-orange-300 border-2 border-black p-1.5 -mx-4 -mt-4 mb-2">
+                    <span class="font-black text-xs uppercase">INPUT LAPORAN PATROLI</span>
+                    <button onclick="closeForm('form-patroli')" class="bg-red-500 text-white font-black px-1 text-xs border border-black">X</button>
+                </div>
+                <input type="text" placeholder="NAMA" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50 input-nama">
+                <input type="text" placeholder="PANGKAT" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50">
+                <select class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50">
+                    <option value="" disabled selected>PILIH WAKTU DUTY</option>
+                    <option value="PAGI">PAGI</option>
+                    <option value="SIANG">SIANG</option>
+                    <option value="SORE">SORE</option>
+                    <option value="MALAM">MALAM</option>
+                </select>
+                <textarea placeholder="KOLOM KEGIATAN PATROLI" rows="2" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50"></textarea>
+                <div>
+                    <label class="text-[9px] font-black block mb-1">UPLOAD FOTO (MAKSIMAL 2)</label>
+                    <input type="file" multiple accept="image/*" class="w-full text-xs font-mono border border-dashed border-black p-1" onchange="validateFiles(this, 2)">
+                </div>
+                <button class="w-full bg-black text-white text-xs font-black py-2 uppercase tracking-widest active:bg-stone-800">KIRIM PATROLI</button>
+            </div>
+
+            <div id="form-gaji" class="hidden bg-white border-4 border-black p-4 btn-shadow max-h-[360px] overflow-y-auto space-y-3">
+                <div class="flex justify-between items-center bg-lime-300 border-2 border-black p-1.5 -mx-4 -mt-4 mb-2">
+                    <span class="font-black text-xs uppercase">PENGAJUAN AMBIL GAJI</span>
+                    <button onclick="closeForm('form-gaji')" class="bg-red-500 text-white font-black px-1 text-xs border border-black">X</button>
+                </div>
+                <input type="text" placeholder="NAMA" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50 input-nama">
+                <input type="text" placeholder="PANGKAT" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50">
+                <input type="number" placeholder="JUMLAH GAJI YANG MAU DICAIRKAN" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50">
+                <button class="w-full bg-black text-white text-xs font-black py-2 uppercase tracking-widest active:bg-stone-800">PROSES PENCAIRAN</button>
+            </div>
+
+            <div id="form-cuti" class="hidden bg-white border-4 border-black p-4 btn-shadow max-h-[360px] overflow-y-auto space-y-3">
+                <div class="flex justify-between items-center bg-pink-300 border-2 border-black p-1.5 -mx-4 -mt-4 mb-2">
+                    <span class="font-black text-xs uppercase">FORMULIR IZIN CUTI</span>
+                    <button onclick="closeForm('form-cuti')" class="bg-red-500 text-white font-black px-1 text-xs border border-black">X</button>
+                </div>
+                <input type="text" placeholder="NAMA" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50 input-nama">
+                <input type="text" placeholder="PANGKAT" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[9px] font-black block">AWAL CUTI</label>
+                        <input type="date" class="w-full border-2 border-black p-1 text-xs font-bold rounded-none bg-stone-50">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black block">AKHIR CUTI</label>
+                        <input type="date" class="w-full border-2 border-black p-1 text-xs font-bold rounded-none bg-stone-50">
+                    </div>
+                </div>
+                <textarea placeholder="KOLOM ALASAN CUTI" rows="2" class="w-full border-2 border-black p-1.5 text-xs font-bold uppercase rounded-none bg-stone-50"></textarea>
+                <button class="w-full bg-black text-white text-xs font-black py-2 uppercase tracking-widest active:bg-stone-800">AJUKAN CUTI</button>
+            </div>
+
         </div>
-        <button onclick="goTo('gaji.html')" class="flex flex-col items-center gap-1 text-white menu-btn">
-            <span class="text-xl">💰</span>
-            <span class="text-[9px] font-black uppercase tracking-wider text-yellow-400">GAJI</span>
-        </button>
+
+        <div class="grid grid-cols-2 gap-4 border-t-4 border-black pt-3 mt-4 bg-gray-100 -mx-6 -mb-6 p-4">
+            <button id="menu-home-btn" onclick="switchTab('home')" class="bg-yellow-400 border-4 border-black py-2 font-black text-xs tracking-wider uppercase text-center btn-shadow active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer">
+                🏠 HOME
+            </button>
+            <button id="menu-buku-btn" onclick="switchTab('buku')" class="bg-white border-4 border-black py-2 font-black text-xs tracking-wider uppercase text-center btn-shadow active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer">
+                📖 BUKU SOP
+            </button>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = "https://iejyusqakqrcavzbscqz.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imllanl1c3Fha3FyY2F2emJzY3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NjQ2OTgsImV4cCI6MjA5NjM0MDY5OH0._z6Owi73t6G8h4He4Vmglgz4gV0eJlIyq9j6dZMAGtM";
+
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function goTo(page) {
-            const ls = document.getElementById('loadingScreen');
-            ls.classList.add('active');
-            setTimeout(() => { window.location.href = page; }, 1400);
+        // Menangkap Elemen Profil
+        const userNameEl = document.getElementById('userName');
+        const userAvatarEl = document.getElementById('userAvatar');
+        const loadingScreen = document.getElementById('loadingScreen');
+
+        // Mengambil data user dari Session Supabase pasca OAuth2 Discord
+        async function getDiscordUserData() {
+            triggerLoading();
+            
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+            async function getDiscordUserData() {
+    triggerLoading();
+
+    // Tunggu dulu Supabase proses URL callback (hash fragment)
+    const { data: { session: sessionFromUrl } } = await supabaseClient.auth.getSession();
+
+    let session = sessionFromUrl;
+
+    // Kalau belum ada, coba ambil dari URL hash (pasca redirect OAuth)
+    if (!session) {
+        const { data, error } = await supabaseClient.auth.exchangeCodeForSession(
+            window.location.href
+        );
+        if (!error && data?.session) {
+            session = data.session;
+        }
+    }
+
+    if (!session) {
+        alert("Sesi tidak valid atau telah berakhir. Silahkan login kembali.");
+        window.location.href = "index.html";
+        return;
+    }
+
+    const user = session.user;
+
+    if (user && user.user_metadata) {
+        const discordName = user.user_metadata.full_name || user.user_metadata.name || "UNKNOWN_USER";
+        const discordAvatar = user.user_metadata.avatar_url || "https://via.placeholder.com/150";
+
+        userNameEl.innerText = discordName;
+        userAvatarEl.src = discordAvatar;
+
+        document.querySelectorAll('.input-nama').forEach(input => {
+            input.value = discordName;
+        });
+    }
+
+    stopLoading();
+}
+
+            const user = session.user;
+            
+            // Mengambil metadata user dari discord
+            if (user && user.user_metadata) {
+                const discordName = user.user_metadata.full_name || user.user_metadata.name || "UNKNOWN_USER";
+                const discordAvatar = user.user_metadata.avatar_url || "https://via.placeholder.com/150";
+
+                // Terapkan ke UI Dashboard
+                userNameEl.innerText = discordName;
+                userAvatarEl.src = discordAvatar;
+
+                // Otomatis isi semua kolom input "NAMA" di formulir dengan nama discord biar ga ngetik berulang
+                const inputsNama = document.querySelectorAll('.input-nama');
+                inputsNama.forEach(input => {
+                    input.value = discordName;
+                });
+            }
+            
+            stopLoading();
         }
 
-        async function init() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) { window.location.href = 'index.html'; return; }
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            const u = user || session.user;
-            const meta = u.user_metadata || {};
-            const identities = u.identities || [];
-            const disc = (identities.find(i => i.provider === 'discord') || {}).identity_data || {};
-            const name = meta.full_name || meta.name || meta.global_name || meta.user_name || disc.full_name || disc.global_name || u.email?.split('@')[0] || 'Anggota';
-            const avatarHash = meta.avatar_hash || disc.avatar_hash;
-            const discordId = meta.provider_id || disc.sub;
-            let avatar = meta.avatar_url || disc.avatar_url || 'https://via.placeholder.com/64';
-            if (avatarHash && discordId) avatar = `https://cdn.discordapp.com/avatars/${discordId}/${avatarHash}.png?size=128`;
-            document.getElementById('userName').textContent = name;
-            document.getElementById('userEmail').textContent = u.email || '';
-            const img = document.getElementById('userAvatar');
-            img.src = avatar;
-            img.onerror = () => img.src = 'https://via.placeholder.com/64';
-            localStorage.setItem('mdt_user', JSON.stringify({ name, avatar, email: u.email }));
+        // Jalankan deteksi data profil saat halaman selesai loading
+        window.addEventListener('DOMContentLoaded', getDiscordUserData);
+
+        // SYSTEM TAB SWITCHING (Home & Buku SOP)
+        function switchTab(tabName) {
+            triggerLoading();
+            
+            // Sembunyikan semua tab & tutup formulir yang terbuka
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            closeAllForms();
+
+            // Tampilkan tab target
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Ganti warna indikator tombol bawah
+            const btnHome = document.getElementById('menu-home-btn');
+            const btnBuku = document.getElementById('menu-buku-btn');
+
+            if (tabName === 'home') {
+                btnHome.className = btnHome.className.replace('bg-white', 'bg-yellow-400');
+                btnBuku.className = btnBuku.className.replace('bg-yellow-400', 'bg-white');
+            } else {
+                btnBuku.className = btnBuku.className.replace('bg-white', 'bg-yellow-400');
+                btnHome.className = btnHome.className.replace('bg-yellow-400', 'bg-white');
+            }
+
+            setTimeout(stopLoading, 400); // Simulasi delay loading screen biar kerasa real-time sistem
         }
 
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            localStorage.removeItem('mdt_user');
-            window.location.href = 'index.html';
+        // SYSTEM MODAL/FORM MANAGER
+        function openForm(formId) {
+            triggerLoading();
+            // Sembunyikan dulu menu grid utamanya
+            document.getElementById('tab-home').classList.remove('active');
+            closeAllForms();
+            
+            // Munculkan form tab baru yang dituju
+            document.getElementById(formId).classList.remove('hidden');
+            setTimeout(stopLoading, 400);
         }
 
-        init();
-    </script>
-</body>
-</html>
+        function closeForm(formId) {
+            triggerLoading();
+            document.getElementById(formId).classList.add('hidden');
+            // Kembalikan ke menu utama grid
+            document.getElementById('tab-home').classList.add('active');
+            setTimeout(stopLoading, 300);
+        }
+
+        function closeAllForms() {
+            document.getElementById('form-duty').classList.add('hidden');
+            document.getElementById('form-patroli').classList.add('hidden');
+            document.getElementById('form-gaji').classList.add('hidden');
+            document.getElementById('form-cuti').classList.add('hidden');
+        }
+
+        // VALIDASI JUMLAH FOTO UPLOAD
+      
